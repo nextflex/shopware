@@ -6,7 +6,7 @@ const { Mixin } = Shopware;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
@@ -73,21 +73,19 @@ export default {
                     this.element.data.product = null;
                 }
             } else {
-                this.productRepository.get(
-                    productId,
-                    this.productSelectContext,
-                    this.selectedProductCriteria,
-                ).then((product) => {
-                    this.element.config.product.value = productId;
+                this.productRepository
+                    .get(productId, this.productSelectContext, this.selectedProductCriteria)
+                    .then((product) => {
+                        this.element.config.product.value = productId;
 
-                    if (this.isCompatEnabled('INSTANCE_SET')) {
-                        this.$set(this.element.data, 'productId', productId);
-                        this.$set(this.element.data, 'product', product);
-                    } else {
-                        this.element.data.productId = productId;
-                        this.element.data.product = product;
-                    }
-                });
+                        if (this.isCompatEnabled('INSTANCE_SET')) {
+                            this.$set(this.element.data, 'productId', productId);
+                            this.$set(this.element.data, 'product', product);
+                        } else {
+                            this.element.data.productId = productId;
+                            this.element.data.product = product;
+                        }
+                    });
             }
 
             this.$emit('element-update', this.element);

@@ -80,7 +80,6 @@ const missingTests = [
     'src/app/component/rule/sw-condition-base-line-item/index.js',
     'src/app/component/rule/sw-condition-is-net-select/index.js',
     'src/app/component/rule/sw-condition-modal/index.js',
-    'src/app/component/sidebar/sw-sidebar/index.js',
     'src/app/component/sidebar/sw-sidebar-item/index.js',
     'src/app/component/sidebar/sw-sidebar-navigation-item/index.js',
     'src/app/component/structure/sw-admin-menu/_sw-admin-menu-item/catalogues.js',
@@ -116,12 +115,10 @@ const missingTests = [
     'src/app/decorator/index.js',
     'src/app/directive/index.ts',
     'src/app/directive/popover.directive.ts',
-    'src/app/directive/tooltip.directive.ts',
     'src/app/filter/index.ts',
     'src/app/init/directive.init.ts',
     'src/app/init/index.ts',
     'src/app/init/login.init.js',
-    'src/app/init/window.init.ts',
     'src/app/mixin/index.js',
     'src/app/plugin/device-helper.plugin.js',
     'src/app/plugin/index.ts',
@@ -134,7 +131,6 @@ const missingTests = [
     'src/app/service/search-type.service.js',
     'src/app/service/shortcut.service.js',
     'src/app/state/action-button.store.ts',
-    'src/app/state/admin-menu.store.js',
     'src/app/state/context.store.ts',
     'src/app/state/extension-component-sections.store.ts',
     'src/app/state/extension-entry-routes.js',
@@ -233,7 +229,6 @@ const missingTests = [
     'src/core/service/utils/object.utils.ts',
     'src/core/service/utils/sort.utils.ts',
     'src/core/service/validation.service.js',
-    'src/core/worker/admin-notification-worker.js',
     'src/core/worker/worker-notification-listener.js',
     'src/core/worker/admin-worker.worker.js',
     'src/core/worker/admin-worker.shared-worker.js',
@@ -362,7 +357,6 @@ const missingTests = [
     'src/module/sw-order/mixin/cart-notification.mixin.ts',
     'src/module/sw-order/order.types.ts',
     'src/module/sw-order/state/order.store.ts',
-    'src/module/sw-order/view/sw-order-create-initial/index.js',
     'src/module/sw-order/view/sw-order-detail-documents/index.js',
     'src/module/sw-privilege-error/index.js',
     'src/module/sw-product/component/sw-product-basic-form/index.js',
@@ -446,7 +440,6 @@ const missingTests = [
     'src/module/sw-settings-mailer/index.js',
     'src/module/sw-settings-newsletter/index.js',
     'src/module/sw-settings-number-range/index.js',
-    'src/module/sw-settings-number-range/page/sw-settings-number-range-create/index.js',
     'src/module/sw-settings-payment/component/sw-plugin-box/index.js',
     'src/module/sw-settings-payment/default-search-configuration.js',
     'src/module/sw-settings-payment/index.js',
@@ -497,8 +490,4 @@ const missingTests = [
 /**
  * @private
  */
-export {
-    missingTests,
-    positionIdentifiers,
-    dataSetIds,
-};
+export { missingTests, positionIdentifiers, dataSetIds };

@@ -1,8 +1,20 @@
 /**
- * @package services-settings
+ * @sw-package after-sales
  */
 import template from './sw-settings-mailer.html.twig';
 import './sw-settings-mailer.scss';
+
+const defaultMailerSettings = {
+    'core.mailerSettings.emailAgent': null,
+    'core.mailerSettings.host': null,
+    'core.mailerSettings.port': null,
+    'core.mailerSettings.username': null,
+    'core.mailerSettings.password': null,
+    'core.mailerSettings.encryption': 'null',
+    'core.mailerSettings.senderAddress': null,
+    'core.mailerSettings.deliveryAddress': null,
+    'core.mailerSettings.disableDelivery': false,
+};
 
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -19,17 +31,7 @@ export default {
             isLoading: true,
             isSaveSuccessful: false,
             isFirstConfiguration: false,
-            mailerSettings: {
-                'core.mailerSettings.emailAgent': null,
-                'core.mailerSettings.host': null,
-                'core.mailerSettings.port': null,
-                'core.mailerSettings.username': null,
-                'core.mailerSettings.password': null,
-                'core.mailerSettings.encryption': 'null',
-                'core.mailerSettings.senderAddress': null,
-                'core.mailerSettings.deliveryAddress': null,
-                'core.mailerSettings.disableDelivery': false,
-            },
+            mailerSettings: { ...defaultMailerSettings },
             smtpHostError: null,
             smtpPortError: null,
         };
@@ -56,7 +58,10 @@ export default {
         },
 
         isSmtpMode() {
-            return this.mailerSettings['core.mailerSettings.emailAgent'] === 'smtp';
+            return [
+                'smtp',
+                'smtp+oauth',
+            ].includes(this.mailerSettings['core.mailerSettings.emailAgent']);
         },
     },
 
@@ -114,6 +119,14 @@ export default {
                 return;
             }
 
+            // Reset mailerSettings as local would take over certain values
+            if (this.mailerSettings['core.mailerSettings.emailAgent'] === 'local') {
+                this.mailerSettings = {
+                    ...defaultMailerSettings,
+                    'core.mailerSettings.emailAgent': 'local',
+                };
+            }
+
             await this.systemConfigApiService.saveValues(this.mailerSettings);
             this.isLoading = false;
         },
@@ -127,13 +140,18 @@ export default {
         },
 
         validateSmtpConfiguration() {
-            this.smtpHostError = !this.mailerSettings['core.mailerSettings.host'] ? {
-                detail: this.$tc('global.error-codes.c1051bb4-d103-4f74-8988-acbcafc7fdc3'),
-            } : null;
+            this.smtpHostError = !this.mailerSettings['core.mailerSettings.host']
+                ? {
+                      detail: this.$tc('global.error-codes.c1051bb4-d103-4f74-8988-acbcafc7fdc3'),
+                  }
+                : null;
 
-            this.smtpPortError = typeof this.mailerSettings['core.mailerSettings.port'] !== 'number' ? {
-                detail: this.$tc('global.error-codes.c1051bb4-d103-4f74-8988-acbcafc7fdc3'),
-            } : null;
+            this.smtpPortError =
+                typeof this.mailerSettings['core.mailerSettings.port'] !== 'number'
+                    ? {
+                          detail: this.$tc('global.error-codes.c1051bb4-d103-4f74-8988-acbcafc7fdc3'),
+                      }
+                    : null;
         },
 
         resetSmtpHostError() {

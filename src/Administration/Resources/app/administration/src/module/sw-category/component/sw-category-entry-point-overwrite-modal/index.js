@@ -2,7 +2,7 @@ import template from './sw-category-entry-point-overwrite-modal.html.twig';
 import './sw-category-entry-point-overwrite-modal.scss';
 
 /**
- * @package inventory
+ * @package discovery
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -10,7 +10,10 @@ export default {
 
     compatConfig: Shopware.compatConfig,
 
-    emits: ['cancel', 'confirm'],
+    emits: [
+        'cancel',
+        'confirm',
+    ],
 
     props: {
         salesChannels: {

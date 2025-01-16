@@ -1,13 +1,17 @@
 import './acl';
 
 /**
- * @package checkout
+ * @package discovery
  */
 
 /* eslint-disable max-len, sw-deprecation-rules/private-feature-declarations */
 Shopware.Component.register('sw-settings-delivery-time-list', () => import('./page/sw-settings-delivery-time-list'));
 Shopware.Component.register('sw-settings-delivery-time-detail', () => import('./page/sw-settings-delivery-time-detail'));
-Shopware.Component.extend('sw-settings-delivery-time-create', 'sw-settings-delivery-time-detail', () => import('./page/sw-settings-delivery-time-create'));
+Shopware.Component.extend(
+    'sw-settings-delivery-time-create',
+    'sw-settings-delivery-time-detail',
+    () => import('./page/sw-settings-delivery-time-create'),
+);
 /* eslint-enable max-len, sw-deprecation-rules/private-feature-declarations */
 
 const { Module } = Shopware;

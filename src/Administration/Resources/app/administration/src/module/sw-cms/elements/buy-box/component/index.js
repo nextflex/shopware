@@ -5,7 +5,7 @@ const { Mixin } = Shopware;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
@@ -32,7 +32,7 @@ export default {
                         name: '1-3 days',
                     },
                     price: [
-                        { gross: 0.00 },
+                        { gross: 0.0 },
                     ],
                 };
             }

@@ -27,7 +27,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Do not use direct or indirect repository calls in a PageLoader. Always use a store-api route to get or put data.
  */
-#[Package('storefront')]
+#[Package('framework')]
 class CheckoutConfirmPageLoader
 {
     /**
@@ -127,7 +127,7 @@ class CheckoutConfirmPageLoader
         }
 
         $validationEvent = new BuildValidationEvent($validation, new DataBag(), $context->getContext());
-        $this->eventDispatcher->dispatch($validationEvent);
+        $this->eventDispatcher->dispatch($validationEvent, $validationEvent->getName());
 
         if ($billingAddress === null) {
             return;
@@ -152,7 +152,7 @@ class CheckoutConfirmPageLoader
         }
 
         $validationEvent = new BuildValidationEvent($validation, new DataBag(), $context->getContext());
-        $this->eventDispatcher->dispatch($validationEvent);
+        $this->eventDispatcher->dispatch($validationEvent, $validationEvent->getName());
 
         if ($shippingAddress === null) {
             return;

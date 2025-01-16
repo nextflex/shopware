@@ -7,12 +7,15 @@ const { mapGetters } = Component.getComponentHelper();
 
 /**
  * @private
- * @package services-settings
+ * @sw-package after-sales
  */
 export default {
     template,
 
-    emits: ['modal-confirm', 'modal-close'],
+    emits: [
+        'modal-confirm',
+        'modal-close',
+    ],
 
     compatConfig: Shopware.compatConfig,
 

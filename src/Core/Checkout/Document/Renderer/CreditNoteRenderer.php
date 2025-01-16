@@ -25,7 +25,7 @@ use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-#[Package('checkout')]
+#[Package('after-sales')]
 final class CreditNoteRenderer extends AbstractDocumentRenderer
 {
     public const TYPE = 'credit_note';
@@ -100,6 +100,11 @@ final class CreditNoteRenderer extends AbstractDocumentRenderer
                 $operation = $operations[$orderId] ?? null;
 
                 if ($operation === null) {
+                    continue;
+                }
+
+                $forceDocumentCreation = $operation->getConfig()['forceDocumentCreation'] ?? true;
+                if (!$forceDocumentCreation && $order->getDocuments()?->first()) {
                     continue;
                 }
 
@@ -203,7 +208,7 @@ final class CreditNoteRenderer extends AbstractDocumentRenderer
             'languageIdChain' => array_values(array_unique(array_filter([$languageId, ...$context->getLanguageIdChain()]))),
         ]);
 
-        $criteria = OrderDocumentCriteriaFactory::create([$orderId], $deepLinkCode)
+        $criteria = OrderDocumentCriteriaFactory::create([$orderId], $deepLinkCode, self::TYPE)
             ->addFilter(new EqualsFilter('lineItems.type', LineItem::CREDIT_LINE_ITEM_TYPE));
 
         /** @var ?OrderEntity $order */
@@ -217,7 +222,7 @@ final class CreditNoteRenderer extends AbstractDocumentRenderer
             'languageIdChain' => array_values(array_unique(array_filter([$languageId, ...$context->getLanguageIdChain()]))),
         ]);
 
-        $criteria = OrderDocumentCriteriaFactory::create([$orderId], $deepLinkCode);
+        $criteria = OrderDocumentCriteriaFactory::create([$orderId], $deepLinkCode, self::TYPE);
 
         /** @var ?OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $versionContext)->get($orderId);

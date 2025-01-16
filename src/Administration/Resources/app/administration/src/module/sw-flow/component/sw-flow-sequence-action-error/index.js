@@ -6,7 +6,7 @@ const { mapGetters } = Component.getComponentHelper();
 
 /**
  * @private
- * @package services-settings
+ * @sw-package after-sales
  */
 export default {
     template,
@@ -26,11 +26,11 @@ export default {
 
     methods: {
         removeWarning(id) {
-            const action = this.sequences.find(sequence => sequence.id === id);
+            const action = this.sequences.find((sequence) => sequence.id === id);
             if (action?.id) {
-                const sequencesInGroup = this.sequences.filter(item => item.parentId === action.parentId
-                    && item.trueCase === action.trueCase
-                    && item.id !== id);
+                const sequencesInGroup = this.sequences.filter(
+                    (item) => item.parentId === action.parentId && item.trueCase === action.trueCase && item.id !== id,
+                );
 
                 sequencesInGroup.forEach((item, index) => {
                     State.commit('swFlowState/updateSequence', {

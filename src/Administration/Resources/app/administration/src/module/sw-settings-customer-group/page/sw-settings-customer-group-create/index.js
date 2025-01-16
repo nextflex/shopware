@@ -1,5 +1,5 @@
 /**
- * @package services-settings
+ * @package discovery
  *
  * @private
  */
@@ -27,7 +27,10 @@ export default {
 
                 this.isSaveSuccessful = true;
 
-                this.$router.push({ name: 'sw.settings.customer.group.detail', params: { id: this.customerGroup.id } });
+                this.$router.push({
+                    name: 'sw.settings.customer.group.detail',
+                    params: { id: this.customerGroup.id },
+                });
             } catch (err) {
                 this.isLoading = false;
 

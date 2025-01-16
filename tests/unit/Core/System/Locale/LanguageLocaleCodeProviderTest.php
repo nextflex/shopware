@@ -6,21 +6,23 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\FetchModeHelper;
-use Shopware\Core\Framework\Test\TestDataCollection;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Language\LanguageLoaderInterface;
 use Shopware\Core\System\Locale\LanguageLocaleCodeProvider;
 use Shopware\Core\System\Locale\LocaleException;
+use Shopware\Core\Test\Stub\Framework\IdsCollection;
 
 /**
  * @internal
  */
+#[Package('discovery')]
 #[CoversClass(LanguageLocaleCodeProvider::class)]
 class LanguageLocaleCodeProviderTest extends TestCase
 {
     private LanguageLocaleCodeProvider $languageLocaleProvider;
 
-    private TestDataCollection $ids;
+    private IdsCollection $ids;
 
     private MockObject&LanguageLoaderInterface $languageLoader;
 
@@ -28,7 +30,7 @@ class LanguageLocaleCodeProviderTest extends TestCase
     {
         $this->languageLoader = $this->createMock(LanguageLoaderInterface::class);
         $this->languageLocaleProvider = new LanguageLocaleCodeProvider($this->languageLoader);
-        $this->ids = new TestDataCollection();
+        $this->ids = new IdsCollection();
     }
 
     public function testGetLocaleForLanguageId(): void

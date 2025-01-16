@@ -1,7 +1,7 @@
 import template from './sw-settings-newsletter.html.twig';
 
 /**
- * @package buyers-experience
+ * @sw-package after-sales
  */
 
 const { Mixin } = Shopware;
@@ -40,15 +40,17 @@ export default {
 
             Promise.all([
                 this.$refs.systemConfig.saveAll(),
-            ]).then(() => {
-                this.isLoading = false;
-                this.isSaveSuccessful = true;
-            }).catch((err) => {
-                this.isLoading = false;
-                this.createNotificationError({
-                    message: err,
+            ])
+                .then(() => {
+                    this.isLoading = false;
+                    this.isSaveSuccessful = true;
+                })
+                .catch((err) => {
+                    this.isLoading = false;
+                    this.createNotificationError({
+                        message: err,
+                    });
                 });
-            });
         },
 
         onLoadingChanged(loading) {

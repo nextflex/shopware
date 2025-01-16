@@ -35,7 +35,7 @@ class EventTelemetryFlowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $transportsCollection = $this->getContainer()->get(TransportCollection::class);
+        $transportsCollection = static::getContainer()->get(TransportCollection::class);
         assertInstanceOf(TransportCollection::class, $transportsCollection);
         $transport = current(iterator_to_array($transportsCollection->getIterator()));
         static::assertInstanceOf(TraceableTransport::class, $transport);
@@ -56,7 +56,7 @@ class EventTelemetryFlowTest extends TestCase
         ]);
         static::assertNotEmpty($this->transport->getEmittedMetrics());
         static::assertEquals(
-            new Metric(new ConfiguredMetric('cache.invalidate.count', 1), $metricConfig),
+            Metric::fromConfigured(new ConfiguredMetric('cache.invalidate.count', 1), $metricConfig),
             $this->transport->getEmittedMetrics()[0]
         );
     }
@@ -73,7 +73,7 @@ class EventTelemetryFlowTest extends TestCase
     {
         Feature::skipTestIfInActive('TELEMETRY_METRICS', $this);
 
-        $userRepository = $this->getContainer()->get('user.repository');
+        $userRepository = static::getContainer()->get('user.repository');
         $criteria = new Criteria();
         $criteria->addAssociations(['aclRoles', 'avatarMedia']);
 
@@ -87,14 +87,14 @@ class EventTelemetryFlowTest extends TestCase
         $userRepository->search($criteria, Context::createDefaultContext())->first();
         static::assertNotEmpty($this->transport->getEmittedMetrics());
         static::assertEquals(
-            new Metric(new ConfiguredMetric('dal.associations.count', 2), $metricConfig),
+            Metric::fromConfigured(new ConfiguredMetric('dal.associations.count', 2), $metricConfig),
             $this->transport->getEmittedMetrics()[0]
         );
     }
 
     private function invalidateCacheFlow(): void
     {
-        $cacheInvalidator = $this->getContainer()->get(CacheInvalidator::class);
+        $cacheInvalidator = static::getContainer()->get(CacheInvalidator::class);
         assertInstanceOf(CacheInvalidator::class, $cacheInvalidator);
         $cacheInvalidator->invalidate(['test-tag']);
     }

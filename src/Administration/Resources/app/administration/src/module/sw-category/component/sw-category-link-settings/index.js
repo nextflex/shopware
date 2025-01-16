@@ -4,7 +4,7 @@ import './sw-category-link-settings.scss';
 const { Criteria } = Shopware.Data;
 
 /**
- * @package inventory
+ * @package discovery
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -12,7 +12,10 @@ export default {
 
     compatConfig: Shopware.compatConfig,
 
-    inject: ['acl', 'repositoryFactory'],
+    inject: [
+        'acl',
+        'repositoryFactory',
+    ],
 
     props: {
         category: {
@@ -144,11 +147,9 @@ export default {
         },
 
         createCategoryCollection() {
-            this.categoryRepository
-                .search(this.internalLinkCriteria, Shopware.Context.api)
-                .then(result => {
-                    this.categoriesCollection = result;
-                });
+            this.categoryRepository.search(this.internalLinkCriteria, Shopware.Context.api).then((result) => {
+                this.categoriesCollection = result;
+            });
         },
 
         onSelectionAdd(item) {

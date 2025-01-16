@@ -13,8 +13,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Pricing\Price;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\AdminFunctionalTestBehaviour;
-use Shopware\Core\Framework\Test\TestDataCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\Test\Stub\Framework\IdsCollection;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -28,11 +28,11 @@ class ProductApiTest extends TestCase
     /**
      * @var EntityRepository<ProductCollection>
      */
-    private $repository;
+    private EntityRepository $repository;
 
     protected function setUp(): void
     {
-        $this->repository = $this->getContainer()->get('product.repository');
+        $this->repository = static::getContainer()->get('product.repository');
     }
 
     public function testModifyProductPriceMatrixOverApi(): void
@@ -40,7 +40,7 @@ class ProductApiTest extends TestCase
         $ruleA = Uuid::randomHex();
         $ruleB = Uuid::randomHex();
 
-        $this->getContainer()->get('rule.repository')->create([
+        static::getContainer()->get('rule.repository')->create([
             ['id' => $ruleA, 'name' => 'test', 'priority' => 1],
             ['id' => $ruleB, 'name' => 'test', 'priority' => 2],
         ], Context::createDefaultContext());
@@ -210,7 +210,7 @@ class ProductApiTest extends TestCase
 
     public function testIncludesWithJsonApi(): void
     {
-        $ids = new TestDataCollection();
+        $ids = new IdsCollection();
 
         $productId = $ids->create('product');
         $data = [
@@ -225,7 +225,7 @@ class ProductApiTest extends TestCase
             'tax' => ['name' => 'test', 'taxRate' => 15],
         ];
 
-        $this->getContainer()->get('product.repository')
+        static::getContainer()->get('product.repository')
             ->create([$data], Context::createDefaultContext());
 
         $this->getBrowser()->request('POST', '/api/search/product', [], [], [], json_encode([
@@ -254,7 +254,7 @@ class ProductApiTest extends TestCase
 
     public function testIncludesWithRelationships(): void
     {
-        $ids = new TestDataCollection();
+        $ids = new IdsCollection();
         $productId = $ids->create('product');
 
         $data = [
@@ -269,13 +269,16 @@ class ProductApiTest extends TestCase
             'tax' => ['name' => 'test', 'taxRate' => 15],
         ];
 
-        $this->getContainer()->get('product.repository')
+        static::getContainer()->get('product.repository')
             ->create([$data], Context::createDefaultContext());
 
         $this->getBrowser()->request('POST', '/api/search/product', [], [], [], json_encode([
             'includes' => [
                 'product' => ['id', 'name', 'tax'],
                 'tax' => ['id', 'name'],
+            ],
+            'associations' => [
+                'tax' => [],
             ],
         ], \JSON_THROW_ON_ERROR));
 

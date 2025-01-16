@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 
 /**
- * @package customer-order
+ * @package checkout
  */
 
 const createWrapper = async () => {
@@ -36,7 +36,6 @@ const createWrapper = async () => {
                 'sw-select-result': true,
             },
         },
-
     });
 };
 

@@ -1,5 +1,5 @@
 /**
- * @package inventory
+ * @package discovery
  */
 import { mount } from '@vue/test-utils';
 
@@ -209,7 +209,6 @@ describe('src/module/sw-category/component/sw-category-entry-point-card', () => 
                 },
             },
         ]);
-
 
         const selectionSalesChannels = new EntityCollection('/sales_channel', 'sales_channel', Context.api, null, [
             {

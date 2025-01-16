@@ -11,7 +11,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\SalesChannelApiTestBehaviour;
-use Shopware\Core\Framework\Test\TestDataCollection;
+use Shopware\Core\Test\Stub\Framework\IdsCollection;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
@@ -25,11 +25,11 @@ class CategoryRouteTest extends TestCase
 
     private KernelBrowser $browser;
 
-    private TestDataCollection $ids;
+    private IdsCollection $ids;
 
     protected function setUp(): void
     {
-        $this->ids = new TestDataCollection();
+        $this->ids = new IdsCollection();
 
         $this->createData();
 
@@ -130,7 +130,7 @@ class CategoryRouteTest extends TestCase
     public function testHomeWithSalesChannelOverride(): void
     {
         /** @var EntityRepository $salesChannelRepository */
-        $salesChannelRepository = $this->getContainer()->get('sales_channel.repository');
+        $salesChannelRepository = static::getContainer()->get('sales_channel.repository');
         $salesChannelRepository->upsert([[
             'id' => $this->ids->get('sales-channel'),
             'homeCmsPageId' => $this->ids->get('cms-page'),
@@ -257,7 +257,7 @@ class CategoryRouteTest extends TestCase
         $linkData['type'] = 'link';
         unset($linkData['cmsPage']);
 
-        $this->getContainer()->get('category.repository')
+        static::getContainer()->get('category.repository')
             ->create([$homeData, $childData, $folderData, $linkData], Context::createDefaultContext());
     }
 
@@ -273,7 +273,7 @@ class CategoryRouteTest extends TestCase
             ];
         }
 
-        $this->getContainer()->get('product.repository')
+        static::getContainer()->get('product.repository')
             ->update($products, Context::createDefaultContext());
     }
 }

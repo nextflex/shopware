@@ -5,7 +5,7 @@ const { Mixin } = Shopware;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
@@ -18,7 +18,7 @@ export default {
 
     computed: {
         currentDemoProducts() {
-            return Shopware.Store.get('cmsPageState').currentDemoProducts;
+            return Shopware.Store.get('cmsPage').currentDemoProducts;
         },
 
         demoProductCount() {

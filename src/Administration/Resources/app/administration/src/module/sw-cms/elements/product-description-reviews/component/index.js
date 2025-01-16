@@ -5,7 +5,7 @@ const { Mixin } = Shopware;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
@@ -68,9 +68,9 @@ export default {
     watch: {
         pageType(newPageType) {
             if (this.isCompatEnabled('INSTANCE_SET')) {
-                this.$set(this.element, 'locked', (newPageType === 'product_detail'));
+                this.$set(this.element, 'locked', newPageType === 'product_detail');
             } else {
-                this.element.locked = (newPageType === 'product_detail');
+                this.element.locked = newPageType === 'product_detail';
             }
         },
     },

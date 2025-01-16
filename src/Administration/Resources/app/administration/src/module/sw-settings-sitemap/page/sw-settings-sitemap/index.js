@@ -1,5 +1,5 @@
 /**
- * @package services-settings
+ * @package discovery
  */
 
 import template from './sw-settings-sitemap.html.twig';
@@ -38,15 +38,18 @@ export default {
             this.isSaveSuccessful = false;
             this.isLoading = true;
 
-            this.$refs.systemConfig.saveAll().then(() => {
-                this.isLoading = false;
-                this.isSaveSuccessful = true;
-            }).catch((err) => {
-                this.isLoading = false;
-                this.createNotificationError({
-                    message: err,
+            this.$refs.systemConfig
+                .saveAll()
+                .then(() => {
+                    this.isLoading = false;
+                    this.isSaveSuccessful = true;
+                })
+                .catch((err) => {
+                    this.isLoading = false;
+                    this.createNotificationError({
+                        message: err,
+                    });
                 });
-            });
         },
 
         onLoadingChanged(loading) {

@@ -4,10 +4,10 @@ namespace Shopware\Tests\Integration\Core\Checkout;
 
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Test\Product\ProductBuilder;
-use Shopware\Core\Framework\Test\IdsCollection;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Test\Integration\Helper\MailEventListener;
 use Shopware\Core\Test\Integration\Traits\TestShortHands;
+use Shopware\Core\Test\Stub\Framework\IdsCollection;
 
 /**
  * @internal
@@ -25,7 +25,7 @@ class BasicOrderProductTest extends TestCase
             ->visibility();
 
         // the product builder has a helper function to write the product values to the database, including all dependencies (rules, currencies, properties, etc)
-        $product->write($this->getContainer());
+        $product->write(static::getContainer());
 
         $context = $this->getContext();
         $context = $this->login($context);

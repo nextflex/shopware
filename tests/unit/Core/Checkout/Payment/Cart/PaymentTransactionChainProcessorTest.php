@@ -24,13 +24,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\Log\Package;
-use Shopware\Core\Framework\Test\IdsCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\StateMachine\Loader\InitialStateIdLoader;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Core\Test\Annotation\DisabledFeatures;
 use Shopware\Core\Test\Generator;
+use Shopware\Core\Test\Stub\Framework\IdsCollection;
 use Shopware\Core\Test\Stub\SystemConfigService\StaticSystemConfigService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -91,7 +91,7 @@ class PaymentTransactionChainProcessorTest extends TestCase
         $processor->process(
             $this->ids->get('test-order'),
             new RequestDataBag(),
-            Generator::createSalesChannelContext()
+            Generator::generateSalesChannelContext()
         );
     }
 
@@ -155,7 +155,7 @@ class PaymentTransactionChainProcessorTest extends TestCase
         $processor->process(
             $this->ids->get('test-order'),
             new RequestDataBag(),
-            Generator::createSalesChannelContext()
+            Generator::generateSalesChannelContext()
         );
     }
 
@@ -170,7 +170,7 @@ class PaymentTransactionChainProcessorTest extends TestCase
         $order = new OrderEntity();
         $order->setId(Uuid::randomHex());
         $order->setTransactions(new OrderTransactionCollection([$transaction]));
-        $context = Generator::createSalesChannelContext();
+        $context = Generator::generateSalesChannelContext();
         $requestDataBag = new RequestDataBag();
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);

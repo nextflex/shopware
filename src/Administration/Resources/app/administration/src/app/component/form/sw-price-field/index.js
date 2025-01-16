@@ -160,21 +160,6 @@ Component.register('sw-price-field', {
         };
     },
 
-    setup() {
-        const onPriceGrossChangeDebounce = debounce(function onPriceGrossChangeDebounce() {
-            this.onPriceGrossChange(this.priceForCurrency.gross);
-        }, 300);
-
-        const onPriceNetChangeDebounce = debounce(function onPriceNetChangeDebounce() {
-            this.onPriceNetChange(this.priceForCurrency.net);
-        }, 300);
-
-        return {
-            onPriceGrossChangeDebounce,
-            onPriceNetChangeDebounce,
-        };
-    },
-
     computed: {
         calculatePriceApiService() {
             return Application.getContainer('factory').apiService.getByName('calculate-price');
@@ -302,8 +287,13 @@ Component.register('sw-price-field', {
 
         onEndsWithDecimalSeparator(value) {
             if (value) {
-                this.onPriceGrossChangeDebounce.cancel();
-                this.onPriceNetChangeDebounce.cancel();
+                // cancel might not be a function if debounce is not active
+                if (this.onPriceGrossChangeDebounce.cancel) {
+                    this.onPriceGrossChangeDebounce.cancel();
+                }
+                if (this.onPriceNetChangeDebounce.cancel) {
+                    this.onPriceNetChangeDebounce.cancel();
+                }
             }
         },
 
@@ -382,12 +372,7 @@ Component.register('sw-price-field', {
         requestTaxValue(value, outputType) {
             this.$emit('price-calculate', true);
             return new Promise((resolve) => {
-                if (
-                    !value ||
-                    typeof value !== 'number' ||
-                    !this.priceForCurrency[outputType] ||
-                    !outputType
-                ) {
+                if (!value || typeof value !== 'number' || !this.priceForCurrency[outputType] || !outputType) {
                     return;
                 }
 
@@ -397,21 +382,23 @@ Component.register('sw-price-field', {
                     return;
                 }
 
-                this.calculatePriceApiService.calculatePrice({
-                    taxId: this.taxRate.id,
-                    currencyId: this.currency.id,
-                    price: this.priceForCurrency[outputType],
-                    output: outputType,
-                }).then(({ data }) => {
-                    let tax = 0;
+                this.calculatePriceApiService
+                    .calculatePrice({
+                        taxId: this.taxRate.id,
+                        currencyId: this.currency.id,
+                        price: this.priceForCurrency[outputType],
+                        output: outputType,
+                    })
+                    .then(({ data }) => {
+                        let tax = 0;
 
-                    data.calculatedTaxes.forEach((item) => {
-                        tax += item.tax;
+                        data.calculatedTaxes.forEach((item) => {
+                            tax += item.tax;
+                        });
+
+                        resolve(tax);
+                        this.$emit('price-calculate', false);
                     });
-
-                    resolve(tax);
-                    this.$emit('price-calculate', false);
-                });
             });
         },
 
@@ -429,5 +416,13 @@ Component.register('sw-price-field', {
         onCloseModal() {
             this.showModal = false;
         },
+
+        onPriceGrossChangeDebounce: debounce(function onPriceGrossChange() {
+            this.onPriceGrossChange(this.priceForCurrency.gross);
+        }, 300),
+
+        onPriceNetChangeDebounce: debounce(function onPriceNetChange() {
+            this.onPriceNetChange(this.priceForCurrency.net);
+        }, 300),
     },
 });

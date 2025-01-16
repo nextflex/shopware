@@ -6,6 +6,9 @@ import template from './sw-mail-header-footer-create.html.twig';
 
 const utils = Shopware.Utils;
 
+/**
+ * @sw-package after-sales
+ */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
     template,
@@ -33,7 +36,10 @@ export default {
 
         saveFinish() {
             this.isSaveSuccessful = false;
-            this.$router.push({ name: 'sw.mail.template.detail_head_foot', params: { id: this.$route.params.id } });
+            this.$router.push({
+                name: 'sw.mail.template.detail_head_foot',
+                params: { id: this.$route.params.id },
+            });
         },
 
         onSave() {

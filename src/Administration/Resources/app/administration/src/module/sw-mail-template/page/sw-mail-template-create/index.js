@@ -3,7 +3,7 @@ import template from './sw-mail-template-create.html.twig';
 const utils = Shopware.Utils;
 
 /**
- * @package buyers-experience
+ * @sw-package after-sales
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -34,7 +34,10 @@ export default {
 
         saveFinish() {
             this.isSaveSuccessful = false;
-            this.$router.push({ name: 'sw.mail.template.detail', params: { id: this.mailTemplate.id } });
+            this.$router.push({
+                name: 'sw.mail.template.detail',
+                params: { id: this.mailTemplate.id },
+            });
         },
 
         onSave() {

@@ -15,14 +15,17 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Shopware\Core\Framework\Adapter\Cache\CacheTracer">
+        <service id="Shopware\Core\Framework\Adapter\Cache\CacheTracer" lazy="true">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="Shopware\Core\Framework\Adapter\Translation\Translator"/>
             <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheTagCollection"/>
         </service>
 
         <service id="shopware.cache.invalidator.storage.redis_adapter" class="Redis" public="true">
-            <factory service="Shopware\Core\Framework\Adapter\Cache\RedisConnectionFactory" method="create"/>
+            <!-- @deprecated tag:v6.7.0 - Replace factory method with getConnection on the next line -->
+            <factory service="Shopware\Core\Framework\Adapter\Redis\RedisConnectionProvider" method="getOrCreateFromDsn"/>
+            <argument>%shopware.cache.invalidation.delay_options.connection%</argument>
+            <!-- @deprecated tag:v6.7.0 - remove next line (dsn argument) -->
             <argument>%shopware.cache.invalidation.delay_options.dsn%</argument>
         </service>
 
@@ -51,6 +54,7 @@
             <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\InvalidatorStorage\AbstractInvalidatorStorage"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="Psr\Log\LoggerInterface"/>
+            <argument type="service" id="request_stack"/>
             <argument>%kernel.environment%</argument>
         </service>
 
@@ -68,16 +72,17 @@
 
         <service id="Shopware\Core\Framework\Adapter\Cache\CacheClearer">
             <argument type="collection">
-                <argument type="service" id="cache.object"/>
-                <argument type="service" id="cache.http"/>
+                <argument type="service" key="object" id="cache.object"/>
+                <argument type="service" key="http" id="cache.http"/>
             </argument>
             <argument type="service" id="cache_clearer"/>
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\ReverseProxy\AbstractReverseProxyGateway" on-invalid="null"/>
             <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheInvalidator"/>
             <argument type="service" id="filesystem"/>
             <argument>%kernel.cache_dir%</argument>
             <argument>%kernel.environment%</argument>
             <argument>%shopware.deployment.cluster_setup%</argument>
-            <argument type="service" id="messenger.bus.shopware"/>
+            <argument type="service" id="messenger.default_bus"/>
             <argument type="service" id="logger"/>
         </service>
 
@@ -102,6 +107,8 @@
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument>%shopware.cache.tagging.each_snippet%</argument>
             <argument>%shopware.cache.tagging.each_config%</argument>
+            <argument>%shopware.product_stream.indexing%</argument>
+
             <tag name="kernel.event_listener" event="Shopware\Core\Content\Category\Event\CategoryIndexerEvent" method="invalidateCategoryRouteByCategoryIds" priority="2000" />
             <tag name="kernel.event_listener" event="Shopware\Core\Content\Category\Event\CategoryIndexerEvent" method="invalidateListingRouteByCategoryIds" priority="2001" />
             <tag name="kernel.event_listener" event="Shopware\Core\Content\LandingPage\Event\LandingPageIndexerEvent" method="invalidateIndexedLandingPages" priority="2000" />
@@ -204,6 +211,7 @@
         <service id="shopware.cache.reverse_proxy.redis" class="Redis">
             <factory service="Shopware\Core\Framework\Adapter\Cache\RedisConnectionFactory" method="create"/>
             <argument>%shopware.http_cache.reverse_proxy.redis_url%</argument>
+
             <deprecated package="shopware/core" version="6.7.0.0">tag:v6.7.0 - The %service_id% service will be removed in v6.7.0.0 without replacement.</deprecated>
         </service>
 
@@ -218,6 +226,18 @@
         <service id="Shopware\Core\Framework\Adapter\Command\CacheInvalidateDelayedCommand">
             <tag name="console.command"/>
             <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheInvalidator"/>
+        </service>
+
+        <service id="Shopware\Core\Framework\Adapter\Command\CacheClearAllCommand">
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheClearer"/>
+            <argument>%kernel.environment%</argument>
+            <argument>%kernel.debug%</argument>
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Shopware\Core\Framework\Adapter\Command\CacheClearHttpCommand">
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheClearer" />
+            <tag name="console.command"/>
         </service>
 
         <service id="shopware.reverse_proxy.http_client" class="GuzzleHttp\Client"/>
@@ -257,6 +277,7 @@
             <argument type="service" id="logger"/>
         </service>
 
+        <!-- @deprecated tag:v6.7.0 - Remove-->
         <service id="Shopware\Core\Framework\Adapter\Cache\ReverseProxy\ReverseProxyCacheClearer">
             <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\ReverseProxy\AbstractReverseProxyGateway"/>
             <tag name="kernel.cache_clearer"/>

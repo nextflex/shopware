@@ -5,7 +5,7 @@ const { Component, Mixin, Context } = Shopware;
 const { mapPropertyErrors } = Component.getComponentHelper();
 
 /**
- * @package buyers-experience
+ * @package discovery
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -13,7 +13,10 @@ export default {
 
     compatConfig: Shopware.compatConfig,
 
-    inject: ['repositoryFactory', 'acl'],
+    inject: [
+        'repositoryFactory',
+        'acl',
+    ],
 
     emits: ['media-folder-renamed'],
 
@@ -63,9 +66,12 @@ export default {
         },
 
         quickActionClasses(disabled) {
-            return ['sw-media-sidebar__quickaction', {
-                'sw-media-sidebar__quickaction--disabled': disabled,
-            }];
+            return [
+                'sw-media-sidebar__quickaction',
+                {
+                    'sw-media-sidebar__quickaction--disabled': disabled,
+                },
+            ];
         },
     },
 };

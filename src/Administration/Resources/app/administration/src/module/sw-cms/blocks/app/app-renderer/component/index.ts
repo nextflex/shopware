@@ -3,7 +3,7 @@ import template from './sw-cms-block-app-renderer.html.twig';
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default Shopware.Component.wrapComponentConfig({
     template,
@@ -16,12 +16,12 @@ export default Shopware.Component.wrapComponentConfig({
                 slots: Array<{
                     slot: string;
                     type: string;
-                }>,
+                }>;
                 customFields?: {
                     slotLayout?: {
                         grid?: string;
-                    }
-                },
+                    };
+                };
             }>,
             required: false,
             default() {

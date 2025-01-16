@@ -5,7 +5,7 @@ const { Mixin, Filter } = Shopware;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
@@ -26,7 +26,7 @@ export default {
                     sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
                     sed diam voluptua.`,
                     price: [
-                        { gross: 19.90 },
+                        { gross: 19.9 },
                     ],
                     cover: {
                         media: {

@@ -20,7 +20,11 @@ export default {
 
     inject: ['systemConfigApiService'],
 
-    emits: ['media-item-click', 'media-item-selection-add', 'media-item-selection-remove'],
+    emits: [
+        'media-item-click',
+        'media-item-selection-add',
+        'media-item-selection-remove',
+    ],
 
     props: {
         item: {
@@ -131,7 +135,7 @@ export default {
         },
 
         /**
-         * @experimental stableVersion:v6.7.0 feature:SPATIAL_BASES
+         * @experimental stableVersion:v6.8.0 feature:SPATIAL_BASES
          */
         isSpatial() {
             // we need to check the media url since media.fileExtension is set directly after upload
@@ -141,10 +145,9 @@ export default {
 
     methods: {
         createdComponent() {
-            this.systemConfigApiService.getValues('core.media')
-                .then((values) => {
-                    this.defaultArReady = values['core.media.defaultEnableAugmentedReality'];
-                });
+            this.systemConfigApiService.getValues('core.media').then((values) => {
+                this.defaultArReady = values['core.media.defaultEnableAugmentedReality'];
+            });
         },
 
         handleItemClick(originalDomEvent) {
@@ -159,9 +162,10 @@ export default {
 
         isSelectionIndicatorClicked(path) {
             return path.some((parent) => {
-                return parent.classList && (
-                    parent.classList.contains('sw-media-base-item__selected-indicator') ||
-                    parent.classList.contains('sw-context-button')
+                return (
+                    parent.classList &&
+                    (parent.classList.contains('sw-media-base-item__selected-indicator') ||
+                        parent.classList.contains('sw-context-button'))
                 );
             });
         },

@@ -2,7 +2,14 @@ name: Downstream
 
 on:
   workflow_dispatch:
+    inputs:
+      nightly:
+        default: ""
   workflow_call:
+    inputs:
+      nightly:
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -11,7 +18,7 @@ permissions:
 jobs:
   rufus:
     name: Rufus
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ !github.event.pull_request || github.event.pull_request.author_association == 'MEMBER' }}
     steps:
       - name: Rufus
@@ -21,10 +28,12 @@ jobs:
           workflow: Downstream
           ref: trunk
           timeout: 15m
+          env:
+            NIGHTLY=${{ inputs.nightly }}
   
   commercial:
     name: Commercial
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ !github.event.pull_request || github.event.pull_request.author_association == 'MEMBER' }}
     steps:
       - name: Commercial
@@ -34,3 +43,5 @@ jobs:
           workflow: Downstream
           ref: trunk
           timeout: 20m
+          env:
+            NIGHTLY=${{ inputs.nightly }}

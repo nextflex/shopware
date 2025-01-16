@@ -1,10 +1,9 @@
 import template from './sw-cms-el-preview-buy-box.html.twig';
 import './sw-cms-el-preview-buy-box.scss';
 
-
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,

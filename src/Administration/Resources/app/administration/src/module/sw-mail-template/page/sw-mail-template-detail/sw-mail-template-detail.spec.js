@@ -1,5 +1,5 @@
 /**
- * @package buyers-experience
+ * @sw-package after-sales
  */
 import { mount } from '@vue/test-utils';
 import EntityCollection from 'src/core/data/entity-collection.data';
@@ -53,7 +53,29 @@ const mailTemplateMediaMock = {
     fileSize: 792866,
 };
 
-const repositoryMockFactory = () => {
+const repositoryMockFactory = (entity) => {
+    if (entity === 'sales_channel') {
+        return {
+            search: () => Promise.resolve({}),
+            get: () =>
+                Promise.resolve({
+                    id: '1a2b3c',
+                    name: 'Storefront',
+                    languages: new EntityCollection(
+                        '/language',
+                        'language',
+                        null,
+                        {},
+                        [
+                            {
+                                id: '2fbb5fe2e29a4d70aa5854ce7ce3e20b',
+                            },
+                        ],
+                        1,
+                    ),
+                }),
+        };
+    }
     return {
         search: () => Promise.resolve({}),
         get: (resolve = null) => {
@@ -77,9 +99,11 @@ const repositoryMockFactory = () => {
 class SyntaxValidationTemplateError extends Error {
     response = {
         data: {
-            errors: [{
-                detail: 'Ooops, syntax eror',
-            }],
+            errors: [
+                {
+                    detail: 'Ooops, syntax eror',
+                },
+            ],
         },
     };
 }
@@ -89,7 +113,7 @@ async function createWrapper(privileges = []) {
         global: {
             provide: {
                 repositoryFactory: {
-                    create: () => repositoryMockFactory(),
+                    create: repositoryMockFactory,
                 },
                 mailService: {
                     testMailTemplate: jest.fn(() => Promise.resolve()),
@@ -100,7 +124,9 @@ async function createWrapper(privileges = []) {
                 },
                 acl: {
                     can: (identifier) => {
-                        if (!identifier) { return true; }
+                        if (!identifier) {
+                            return true;
+                        }
 
                         return privileges.includes(identifier);
                     },
@@ -128,7 +154,9 @@ async function createWrapper(privileges = []) {
                 'sw-container': {
                     template: '<div><slot></slot></div>',
                 },
-                'sw-button': await wrapTestComponent('sw-button', { sync: true }),
+                'sw-button': await wrapTestComponent('sw-button', {
+                    sync: true,
+                }),
                 'sw-button-deprecated': await wrapTestComponent('sw-button-deprecated', { sync: true }),
                 'sw-button-process': true,
                 'sw-language-info': true,
@@ -138,6 +166,7 @@ async function createWrapper(privileges = []) {
                 'sw-modal': true,
                 'sw-text-field': true,
                 'sw-context-menu-item': true,
+                'sw-alert': true,
                 'sw-code-editor': {
                     props: [
                         'disabled',
@@ -246,7 +275,11 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
         await wrapper.setData({ mailTemplate: mailTemplateMock });
         const mediaLengthBeforeTest = wrapper.vm.mailTemplate.media.length;
 
-        expect(wrapper.vm.successfulUpload({ targetId: '30c0082ccb03494799b42f22c7fa07d9' })).toBeUndefined();
+        expect(
+            wrapper.vm.successfulUpload({
+                targetId: '30c0082ccb03494799b42f22c7fa07d9',
+            }),
+        ).toBeUndefined();
         expect(wrapper.vm.mailTemplate.media).toHaveLength(mediaLengthBeforeTest);
     });
 
@@ -273,15 +306,17 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
             '30c0082ccb03494799b42f22c7fa07d9': { mailTemplateMediaMock },
         });
 
-        const hasMediaBeforeTest = wrapper.vm.mailTemplate.media
-            .some((media) => media.id === 'ad3466455ed794bb9e0f28s8g3701s1z');
+        const hasMediaBeforeTest = wrapper.vm.mailTemplate.media.some(
+            (media) => media.id === 'ad3466455ed794bb9e0f28s8g3701s1z',
+        );
         expect(hasMediaBeforeTest).toBeTruthy();
 
         wrapper.vm.onDeleteSelectedMedia();
 
         expect(wrapper.vm.mailTemplate.media).toHaveLength(mailTemplateMock.media.length);
-        const hasMediaAfterTest = wrapper.vm.mailTemplate.media
-            .some((media) => media.id === 'ad3466455ed794bb9e0f28s8g3701s1z');
+        const hasMediaAfterTest = wrapper.vm.mailTemplate.media.some(
+            (media) => media.id === 'ad3466455ed794bb9e0f28s8g3701s1z',
+        );
         expect(hasMediaAfterTest).toBeFalsy();
     });
 
@@ -293,13 +328,45 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
         });
 
         [
-            { selector: wrapper.find('.sw-mail-template-detail__save-action'), attribute: 'disabled', expect: 'true' },
-            { selector: { wrappers: wrapper.findAll('sw-textarea-field-stub') }, attribute: 'disabled', expect: 'true' },
-            { selector: { wrappers: wrapper.findAll('.sw-code-editor') }, attribute: 'disabled', expect: '' },
-            { selector: { wrappers: wrapper.findAll('sw-context-menu-item-stub') }, attribute: 'disabled', expect: 'true' },
-            { selector: wrapper.find('sw-entity-single-select-stub'), attribute: 'disabled', expect: 'true' },
-            { selector: wrapper.find('sw-media-upload-v2-stub'), attribute: 'disabled', expect: 'true' },
-            { selector: { wrappers: wrapper.findAll('sw-text-field-stub') }, attribute: 'disabled', expect: 'true' },
+            {
+                selector: wrapper.find('.sw-mail-template-detail__save-action'),
+                attribute: 'disabled',
+                expect: 'true',
+            },
+            {
+                selector: {
+                    wrappers: wrapper.findAll('sw-textarea-field-stub'),
+                },
+                attribute: 'disabled',
+                expect: 'true',
+            },
+            {
+                selector: { wrappers: wrapper.findAll('.sw-code-editor') },
+                attribute: 'disabled',
+                expect: '',
+            },
+            {
+                selector: {
+                    wrappers: wrapper.findAll('sw-context-menu-item-stub'),
+                },
+                attribute: 'disabled',
+                expect: 'true',
+            },
+            {
+                selector: wrapper.find('sw-entity-single-select-stub'),
+                attribute: 'disabled',
+                expect: 'true',
+            },
+            {
+                selector: wrapper.find('sw-media-upload-v2-stub'),
+                attribute: 'disabled',
+                expect: 'true',
+            },
+            {
+                selector: { wrappers: wrapper.findAll('sw-text-field-stub') },
+                attribute: 'disabled',
+                expect: 'true',
+            },
             {
                 selector: wrapper.find('.sw-mail-template-detail__attachments-info-grid'),
                 attribute: 'show-selection',
@@ -310,7 +377,7 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
                 element.selector = { wrappers: [element.selector] };
             }
 
-            element.selector.wrappers.forEach(el => {
+            element.selector.wrappers.forEach((el) => {
                 expect(el.attributes()[element.attribute]).toBe(element.expect);
             });
         });
@@ -331,24 +398,56 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
         await flushPromises();
 
         [
-            { selector: wrapper.find('.sw-mail-template-detail__save-action'), attribute: 'disabled', expect: undefined },
-            { selector: { wrappers: wrapper.findAll('sw-textarea-field-stub') }, attribute: 'disabled', expect: undefined },
-            { selector: { wrappers: wrapper.findAll('.sw-code-editor') }, attribute: 'disabled', expect: undefined },
-            { selector: { wrappers: wrapper.findAll('sw-context-menu-item-stub') }, attribute: 'disabled', expect: undefined },
-            { selector: wrapper.find('sw-entity-single-select-stub'), attribute: 'disabled', expect: undefined },
-            { selector: wrapper.find('sw-media-upload-v2-stub'), attribute: 'disabled', expect: undefined },
-            { selector: { wrappers: wrapper.findAll('sw-text-field-stub') }, attribute: 'disabled', expect: undefined },
+            {
+                selector: wrapper.find('.sw-mail-template-detail__save-action'),
+                attribute: 'disabled',
+                expect: undefined,
+            },
+            {
+                selector: {
+                    wrappers: wrapper.findAll('sw-textarea-field-stub'),
+                },
+                attribute: 'disabled',
+                expect: undefined,
+            },
+            {
+                selector: { wrappers: wrapper.findAll('.sw-code-editor') },
+                attribute: 'disabled',
+                expect: undefined,
+            },
+            {
+                selector: {
+                    wrappers: wrapper.findAll('sw-context-menu-item-stub'),
+                },
+                attribute: 'disabled',
+                expect: undefined,
+            },
+            {
+                selector: wrapper.find('sw-entity-single-select-stub'),
+                attribute: 'disabled',
+                expect: undefined,
+            },
+            {
+                selector: wrapper.find('sw-media-upload-v2-stub'),
+                attribute: 'disabled',
+                expect: undefined,
+            },
+            {
+                selector: { wrappers: wrapper.findAll('sw-text-field-stub') },
+                attribute: 'disabled',
+                expect: undefined,
+            },
             {
                 selector: wrapper.find('.sw-mail-template-detail__attachments-info-grid'),
                 attribute: 'show-selection',
                 expect: 'true',
             },
-        ].forEach(element => {
+        ].forEach((element) => {
             if (!Array.isArray(element.selector.wrappers)) {
                 element.selector = { wrappers: [element.selector] };
             }
 
-            element.selector.wrappers.forEach(el => {
+            element.selector.wrappers.forEach((el) => {
                 expect(el.attributes()[element.attribute]).toBe(element.expect);
             });
         });
@@ -394,7 +493,8 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
                 subject: 'Your order with {{ salesChannel.name }} is partially paid',
                 contentPlain: 'the status of your order at {{ salesChannel.translated.name }}',
                 // eslint-disable-next-line max-len
-                contentHtml: '{{ order.orderCustomer.salutation.translated.letterName }} {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
+                contentHtml:
+                    '{{ order.orderCustomer.salutation.translated.letterName }} {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
                 senderName: '{{ salesChannel.name }}',
             },
             testerMail: 'foo@bar.com',
@@ -433,7 +533,8 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
                     subject: 'Your order with {{ salesChannel.name }} is partially paid',
                     contentPlain: 'the status of your order at {{ salesChannel.translated.name }}',
                     // eslint-disable-next-line max-len
-                    contentHtml: '{{ order.orderCustomer.salutation.translated.letterName }} {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
+                    contentHtml:
+                        '{{ order.orderCustomer.salutation.translated.letterName }} {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
                     senderName: '{{ salesChannel.name }}',
                 },
             },
@@ -555,7 +656,8 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
                 subject: 'Your order with {{ salesChannel.name }} is partially paid',
                 contentPlain: 'the status of your order at {{ salesChannel.translated.name }}',
                 // eslint-disable-next-line max-len
-                contentHtml: '{{ order.deliveries.first.stateMachineState.translated.name }} {{ order.deliveries.at(1).trackingCodes.0 }},<br/><br/>',
+                contentHtml:
+                    '{{ order.deliveries.first.stateMachineState.translated.name }} {{ order.deliveries.at(1).trackingCodes.0 }},<br/><br/>',
                 senderName: '{{ salesChannel.name }}',
             },
             testerMail: 'foo@bar.com',
@@ -566,7 +668,8 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
         const sendTestMail = wrapper.find('.sw-mail-template-detail__send-test-mail');
         await sendTestMail.trigger('click');
 
-        const contentHtmlAfterReplace = '{{ order.deliveries.0.stateMachineState.translated.name }} {{ order.deliveries.1.trackingCodes.0 }},<br/><br/>';
+        const contentHtmlAfterReplace =
+            '{{ order.deliveries.0.stateMachineState.translated.name }} {{ order.deliveries.1.trackingCodes.0 }},<br/><br/>';
         const mailTemplate = { ...wrapper.vm.mailTemplate };
         mailTemplate.contentHtml = contentHtmlAfterReplace;
 
@@ -590,7 +693,8 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
                 subject: 'Your order with {{ salesChannel.name }} is partially paid',
                 contentPlain: 'the status of your order at {{ salesChannel.translated.name }}',
                 // eslint-disable-next-line max-len
-                contentHtml: '{{ order.orderCustomer.salutation.translated.letterName {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
+                contentHtml:
+                    '{{ order.orderCustomer.salutation.translated.letterName {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
                 senderName: '{{ salesChannel.name }}',
                 mailTemplateTypeId: 'typeId',
             },
@@ -626,7 +730,8 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
                 subject: 'Your order with {{ salesChannel.name }} is partially paid',
                 contentPlain: 'the status of your order at {{ salesChannel.translated.name }}',
                 // eslint-disable-next-line max-len
-                contentHtml: '{{ order.orderCustomer.salutation.translated.letterName {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
+                contentHtml:
+                    '{{ order.orderCustomer.salutation.translated.letterName {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
                 senderName: '{{ salesChannel.name }}',
                 mailTemplateTypeId: 'typeId',
             },
@@ -663,7 +768,8 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
                 subject: 'Your order with {{ salesChannel.name }} is partially paid',
                 contentPlain: 'the status of your order at {{ salesChannel.translated.name }}',
                 // eslint-disable-next-line max-len
-                contentHtml: '{{ order.orderCustomer.salutation.translated.letterName {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
+                contentHtml:
+                    '{{ order.orderCustomer.salutation.translated.letterName {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
                 senderName: '{{ salesChannel.name }}',
             },
             testerMail: 'foo@bar.com',
@@ -723,7 +829,8 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
                     subject: 'Your order with {{ salesChannel.name }} is partially paid',
                     contentPlain: 'the status of your order at {{ salesChannel.translated.name }}',
                     // eslint-disable-next-line max-len
-                    contentHtml: '{{ order.orderCustomer.salutation.translated.letterName }} {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
+                    contentHtml:
+                        '{{ order.orderCustomer.salutation.translated.letterName }} {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
                     senderName: '{{ salesChannel.name }}',
                 },
             },
@@ -756,5 +863,39 @@ describe('modules/sw-mail-template/page/sw-mail-template-detail', () => {
         });
 
         wrapper.vm.createNotificationError.mockRestore();
+    });
+
+    it('should display an notification if content language is not assigned to selected sales channel', async () => {
+        wrapper = await createWrapper(['api_send_email']);
+
+        await wrapper.setData({
+            mailTemplate: {
+                ...mailTemplateTypeMock,
+                subject: 'Your order with {{ salesChannel.name }} is partially paid',
+                contentPlain: 'the status of your order at {{ salesChannel.translated.name }}',
+                // eslint-disable-next-line max-len
+                contentHtml:
+                    '{{ order.orderCustomer.salutation.translated.letterName }} {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/><br/>',
+                senderName: '{{ salesChannel.name }}',
+            },
+            testerMail: 'foo@bar.com',
+            isLoading: false,
+            testMailSalesChannelId: '1a2b3c',
+        });
+
+        const sendTestMail = wrapper.findComponent('.sw-mail-template-detail__send-test-mail');
+
+        expect(sendTestMail.attributes().disabled).toBeUndefined();
+
+        await sendTestMail.trigger('click');
+
+        expect(wrapper.vm.showLanguageNotAssignedToSalesChannelWarning).toBeFalsy();
+
+        Shopware.Context.api.languageId = 'foo';
+        await sendTestMail.trigger('click');
+
+        await flushPromises();
+
+        expect(wrapper.vm.showLanguageNotAssignedToSalesChannelWarning).toBeTruthy();
     });
 });

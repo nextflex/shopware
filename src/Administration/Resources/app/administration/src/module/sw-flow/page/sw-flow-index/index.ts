@@ -7,7 +7,7 @@ const { Criteria } = Shopware.Data;
 
 /**
  * @private
- * @package services-settings
+ * @sw-package after-sales
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default Shopware.Component.wrapComponentConfig({
@@ -15,14 +15,17 @@ export default Shopware.Component.wrapComponentConfig({
 
     compatConfig: Shopware.compatConfig,
 
-    inject: ['acl', 'repositoryFactory'],
+    inject: [
+        'acl',
+        'repositoryFactory',
+    ],
 
     data(): {
-        isLoading: boolean,
-        term: string,
-        total: number,
-        showUploadModal: boolean,
-        } {
+        isLoading: boolean;
+        term: string;
+        total: number;
+        showUploadModal: boolean;
+    } {
         return {
             isLoading: false,
             term: '',

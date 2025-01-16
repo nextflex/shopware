@@ -27,8 +27,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\FieldException\ExpectedAr
 use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\HttpException;
 use Shopware\Core\Framework\Log\Package;
+use Shopware\Core\Framework\Script\Exception\HookInjectionException;
+use Shopware\Core\Framework\Script\Execution\Hook;
 use Shopware\Core\Framework\Validation\WriteConstraintViolationException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 #[Package('core')]
 class DataAbstractionLayerException extends HttpException
@@ -80,6 +83,9 @@ class DataAbstractionLayerException extends HttpException
     public const PARENT_FIELD_NOT_FOUND_EXCEPTION = 'FRAMEWORK__PARENT_FIELD_NOT_FOUND_EXCEPTION';
     public const PRIMARY_KEY_NOT_PROVIDED = 'FRAMEWORK__PRIMARY_KEY_NOT_PROVIDED';
     public const NO_GENERATOR_FOR_FIELD_TYPE = 'FRAMEWORK__NO_GENERATOR_FOR_FIELD_TYPE';
+    public const FOREIGN_KEY_NOT_FOUND_IN_DEFINITION = 'FRAMEWORK__FOREIGN_KEY_NOT_FOUND_IN_DEFINITION';
+    public const HOOK_INJECTION_EXCEPTION = 'FRAMEWORK__HOOK_INJECTION_EXCEPTION';
+    public const FRAMEWORK_DEPRECATED_DEFINITION_CALL = 'FRAMEWORK__DEPRECATED_DEFINITION_CALL';
 
     public static function invalidSerializerField(string $expectedClass, Field $field): self
     {
@@ -746,7 +752,7 @@ class DataAbstractionLayerException extends HttpException
         );
     }
 
-    public static function invalidWriteConstraintViolation(\Symfony\Component\Validator\ConstraintViolationList $violationList, string $getPath): WriteConstraintViolationException
+    public static function invalidWriteConstraintViolation(ConstraintViolationList $violationList, string $getPath): WriteConstraintViolationException
     {
         return new WriteConstraintViolationException($violationList, $getPath);
     }
@@ -759,5 +765,56 @@ class DataAbstractionLayerException extends HttpException
     public static function entityRepositoryNotFound(string $entity): EntityRepositoryNotFoundException
     {
         return new EntityRepositoryNotFoundException($entity);
+    }
+
+    public static function foreignKeyNotFoundInDefinition(string $association, string $entityDefinition): self
+    {
+        return new self(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            self::FOREIGN_KEY_NOT_FOUND_IN_DEFINITION,
+            'Foreign key for association "{{ association }}" not found. Please add one to "{{ entityDefinition }}"',
+            ['association' => $association, 'entityDefinition' => $entityDefinition]
+        );
+    }
+
+    public static function versionFieldNotFound(string $field): self
+    {
+        return new self(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            self::FIELD_NOT_FOUND,
+            'Field "{{ field }}" is missing a reference version field',
+            ['field' => $field]
+        );
+    }
+
+    /**
+     * @deprecated tag:v6.7.0 - reason:return-type-change - Will only return 'self' in the future
+     */
+    public static function hookInjectionException(Hook $hook, string $class, string $required): self|HookInjectionException
+    {
+        if (!Feature::isActive('v6.7.0.0')) {
+            return new HookInjectionException($hook, $class, $required);
+        }
+
+        return new self(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            self::HOOK_INJECTION_EXCEPTION,
+            'Class {{ class }} is only executable in combination with hooks that implement the {{ required }} interface. Hook {{ hook }} does not implement this interface',
+            ['class' => $class, 'required' => $required, 'hook' => $hook]
+        );
+    }
+
+    /**
+     * @internal
+     *
+     * @deprecated tag:v6.7.0 - reason:remove-subscriber - remove method completely not used anymore
+     */
+    public static function deprecatedDefinitionCall(): self
+    {
+        return new self(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            self::FRAMEWORK_DEPRECATED_DEFINITION_CALL,
+            'Method getDefinitionClass is deprecated. Use getEntityName instead.'
+        );
     }
 }

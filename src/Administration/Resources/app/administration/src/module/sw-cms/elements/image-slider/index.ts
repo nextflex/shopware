@@ -18,7 +18,7 @@ type ImageSliderItemConfig = {
     newTab: boolean;
     url: string;
     mediaId: string;
-}
+};
 
 type ImageSliderItem = {
     newTab: boolean;
@@ -51,7 +51,7 @@ Shopware.Service('cmsService').registerCmsElement({
         },
         navigationDots: {
             source: 'static',
-            value: null,
+            value: 'none',
         },
         displayMode: {
             source: 'static',

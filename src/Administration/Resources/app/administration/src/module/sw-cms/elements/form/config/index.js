@@ -5,7 +5,7 @@ const { Mixin } = Shopware;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
@@ -45,8 +45,10 @@ export default {
         async setShopMail() {
             const shopMail = await this.getShopMail();
 
-            if (this.element.config.defaultMailReceiver.value
-                && !this.element.config.mailReceiver.value.includes(shopMail)) {
+            if (
+                this.element.config.defaultMailReceiver.value &&
+                !this.element.config.mailReceiver.value.includes(shopMail)
+            ) {
                 this.element.config.mailReceiver.value.push(shopMail);
             }
         },

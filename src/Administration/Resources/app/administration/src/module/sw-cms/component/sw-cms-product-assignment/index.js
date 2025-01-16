@@ -5,14 +5,17 @@ const { Criteria } = Shopware.Data;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
 
     compatConfig: Shopware.compatConfig,
 
-    emits: ['change', 'paginate'],
+    emits: [
+        'change',
+        'paginate',
+    ],
 
     data() {
         return {
@@ -98,7 +101,6 @@ export default {
 
             return Promise.resolve();
         },
-
 
         onSelectCollapsed() {
             this.resultCollection = null;

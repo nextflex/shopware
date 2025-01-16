@@ -17,12 +17,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Metric
 use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Metric\MaxResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Metric\StatsResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\Test\IdsCollection;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\SalesChannelApiTestBehaviour;
-use Shopware\Core\Framework\Test\TestDataCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
+use Shopware\Core\Test\Stub\Framework\IdsCollection;
 use Shopware\Core\Test\TestDefaults;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +38,7 @@ class ProductListingRouteTest extends TestCase
 
     private KernelBrowser $browser;
 
-    private TestDataCollection $ids;
+    private IdsCollection $ids;
 
     private string $productId;
 
@@ -64,15 +63,15 @@ class ProductListingRouteTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->ids = new TestDataCollection();
+        $this->ids = new IdsCollection();
         $this->createSalesChannelContext(['id' => $this->ids->create('sales-channel')]);
 
         /** @var EntityRepository $categoryRepository */
-        $categoryRepository = $this->getContainer()->get('category.repository');
+        $categoryRepository = static::getContainer()->get('category.repository');
         $this->categoryRepository = $categoryRepository;
 
         /** @var EntityRepository $productRepository */
-        $productRepository = $this->getContainer()->get('product.repository');
+        $productRepository = static::getContainer()->get('product.repository');
         $this->productRepository = $productRepository;
     }
 
@@ -173,23 +172,23 @@ class ProductListingRouteTest extends TestCase
     #[DataProvider('filterAggregationsWithProducts')]
     public function testFilterAggregationsWithProducts(IdsCollection $ids, array $product, Request $request, array $expected): void
     {
-        $parent = $this->getContainer()->get(Connection::class)->fetchOne(
+        $parent = static::getContainer()->get(Connection::class)->fetchOne(
             'SELECT LOWER(HEX(navigation_category_id)) FROM sales_channel WHERE id = :id',
             ['id' => Uuid::fromHexToBytes(TestDefaults::SALES_CHANNEL)]
         );
 
-        $this->getContainer()->get('category.repository')
+        static::getContainer()->get('category.repository')
             ->create([['id' => $ids->get('category'), 'name' => 'test', 'parentId' => $parent]], Context::createDefaultContext());
 
         $categoryId = $product['categories'][0]['id'];
 
-        $this->getContainer()->get('product.repository')
+        static::getContainer()->get('product.repository')
             ->create([$product], Context::createDefaultContext());
 
-        $context = $this->getContainer()->get(SalesChannelContextFactory::class)
+        $context = static::getContainer()->get(SalesChannelContextFactory::class)
             ->create(Uuid::randomHex(), TestDefaults::SALES_CHANNEL);
 
-        $listing = $this->getContainer()
+        $listing = static::getContainer()
             ->get(ProductListingRoute::class)
             ->load($categoryId, $request, $context, new Criteria())
             ->getResult();
@@ -216,7 +215,7 @@ class ProductListingRouteTest extends TestCase
      */
     public static function filterAggregationsWithProducts(): array
     {
-        $ids = new TestDataCollection();
+        $ids = new IdsCollection();
 
         $defaults = [
             'id' => $ids->get('product'),
@@ -709,7 +708,7 @@ class ProductListingRouteTest extends TestCase
             'products' => $products,
         ];
 
-        $this->getContainer()->get('product_stream.repository')->create([[
+        static::getContainer()->get('product_stream.repository')->create([[
             'id' => $this->ids->create('productStream'),
             'name' => 'test',
             'filters' => [[

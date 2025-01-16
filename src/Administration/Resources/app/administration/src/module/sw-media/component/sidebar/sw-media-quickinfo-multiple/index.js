@@ -4,7 +4,7 @@ import './sw-media-quickinfo-multiple.scss';
 const { Mixin } = Shopware;
 
 /**
- * @package buyers-experience
+ * @package discovery
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -73,15 +73,21 @@ export default {
         },
 
         quickActionClassesDelete(disabled) {
-            return ['sw-media-sidebar__quickaction', {
-                'sw-media-sidebar__quickaction--disabled': disabled,
-            }];
+            return [
+                'sw-media-sidebar__quickaction',
+                {
+                    'sw-media-sidebar__quickaction--disabled': disabled,
+                },
+            ];
         },
 
         quickActionClasses(disabled) {
-            return ['sw-media-sidebar__quickaction', {
-                'sw-media-sidebar__quickaction--disabled': disabled,
-            }];
+            return [
+                'sw-media-sidebar__quickaction',
+                {
+                    'sw-media-sidebar__quickaction--disabled': disabled,
+                },
+            ];
         },
     },
 };

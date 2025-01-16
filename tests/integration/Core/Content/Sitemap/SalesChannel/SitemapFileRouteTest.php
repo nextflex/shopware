@@ -9,8 +9,8 @@ use Shopware\Core\Content\Sitemap\Service\SitemapLister;
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\SalesChannelApiTestBehaviour;
-use Shopware\Core\Framework\Test\TestDataCollection;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
+use Shopware\Core\Test\Stub\Framework\IdsCollection;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
@@ -25,11 +25,11 @@ class SitemapFileRouteTest extends TestCase
 
     private KernelBrowser $browser;
 
-    private TestDataCollection $ids;
+    private IdsCollection $ids;
 
     protected function setUp(): void
     {
-        $this->ids = new TestDataCollection();
+        $this->ids = new IdsCollection();
 
         $this->browser = $this->createCustomSalesChannelBrowser([
             'id' => $this->ids->create('sales-channel'),
@@ -38,13 +38,13 @@ class SitemapFileRouteTest extends TestCase
 
     public function testSitemapFiles(): void
     {
-        $fileSystem = $this->getContainer()->get('shopware.filesystem.sitemap');
+        $fileSystem = static::getContainer()->get('shopware.filesystem.sitemap');
         static::assertInstanceOf(FilesystemOperator::class, $fileSystem);
 
-        $sitemapLister = $this->getContainer()->get(SitemapLister::class);
+        $sitemapLister = static::getContainer()->get(SitemapLister::class);
         static::assertInstanceOf(SitemapLister::class, $sitemapLister);
 
-        $context = $this->getContainer()->get(SalesChannelContextFactory::class)->create('', $this->ids->get('sales-channel'));
+        $context = static::getContainer()->get(SalesChannelContextFactory::class)->create('', $this->ids->get('sales-channel'));
 
         $sitemapPath = 'sitemap/salesChannel-' . $context->getSalesChannelId() . '-' . $context->getLanguageId();
 
@@ -67,6 +67,9 @@ class SitemapFileRouteTest extends TestCase
         $matches = [];
         preg_match($regex, $url, $matches);
 
-        return $matches[1];
+        $filePath = $matches[1] ?? null;
+        static::assertIsString($filePath);
+
+        return $filePath;
     }
 }

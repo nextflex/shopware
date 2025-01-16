@@ -14,7 +14,11 @@ export default {
 
     inheritAttrs: false,
 
-    inject: ['shopwareExtensionService', 'extensionStoreActionService', 'cacheApiService'],
+    inject: [
+        'shopwareExtensionService',
+        'extensionStoreActionService',
+        'cacheApiService',
+    ],
 
     emits: ['update-list'],
 
@@ -109,8 +113,7 @@ export default {
         },
 
         permissions() {
-            return Object.keys(this.extension.permissions).length ?
-                this.extension.permissions : null;
+            return Object.keys(this.extension.permissions).length ? this.extension.permissions : null;
         },
 
         assetFilter() {
@@ -146,8 +149,9 @@ export default {
         },
 
         extensionMainModule() {
-            return Shopware.State.get('extensionMainModules').mainModules
-                .find(mainModule => mainModule.extensionName === this.extension.name);
+            return Shopware.State.get('extensionMainModules').mainModules.find(
+                (mainModule) => mainModule.extensionName === this.extension.name,
+            );
         },
 
         link() {
@@ -176,19 +180,15 @@ export default {
         },
 
         consentAffirmationModalTitle() {
-            return this.$tc(
-                'sw-extension-store.component.sw-extension-permissions-modal.titleNewPermissions',
-                1,
-                { extensionLabel: this.extension.label },
-            );
+            return this.$tc('sw-extension-store.component.sw-extension-permissions-modal.titleNewPermissions', 1, {
+                extensionLabel: this.extension.label,
+            });
         },
 
         consentAffirmationModalDescription() {
-            return this.$tc(
-                'sw-extension-store.component.sw-extension-permissions-modal.descriptionNewPermissions',
-                1,
-                { extensionLabel: this.extension.label },
-            );
+            return this.$tc('sw-extension-store.component.sw-extension-permissions-modal.descriptionNewPermissions', 1, {
+                extensionLabel: this.extension.label,
+            });
         },
 
         extensionManagementDisabled() {
@@ -220,10 +220,12 @@ export default {
                 return true;
             }
 
-            if (!this.extensionManagementDisabled
-                && this.extension.storeLicense
-                && this.extension.storeLicense.variant === 'rent'
-                && this.extension.storeLicense.expirationDate === null) {
+            if (
+                !this.extensionManagementDisabled &&
+                this.extension.storeLicense &&
+                this.extension.storeLicense.variant === 'rent' &&
+                this.extension.storeLicense.expirationDate === null
+            ) {
                 return true;
             }
 
@@ -281,11 +283,7 @@ export default {
             this.isLoading = true;
 
             try {
-                await this.shopwareExtensionService.uninstallExtension(
-                    this.extension.name,
-                    this.extension.type,
-                    removeData,
-                );
+                await this.shopwareExtensionService.uninstallExtension(this.extension.name, this.extension.type, removeData);
                 this.clearCacheAndReloadPage();
             } catch (e) {
                 this.showExtensionErrors(e);
@@ -325,10 +323,10 @@ export default {
             }
         },
 
-        async closeModalAndRemoveExtension() {
+        async closeModalAndRemoveExtension(removeData) {
             // we close the modal in the called methods before updating the listing
             if (this.extension.storeLicense === null || this.extension.storeLicense.variant !== 'rent') {
-                await this.removeExtension();
+                await this.removeExtension(removeData);
                 this.showRemovalModal = false;
 
                 return;
@@ -389,15 +387,12 @@ export default {
             Utils.debug.warn(this._name, 'No implementation of installAndActivateExtension found');
         },
 
-        async removeExtension() {
+        async removeExtension(removeData) {
             try {
                 this.showRemovalModal = false;
                 this.isLoading = true;
 
-                await this.shopwareExtensionService.removeExtension(
-                    this.extension.name,
-                    this.extension.type,
-                );
+                await this.shopwareExtensionService.removeExtension(this.extension.name, this.extension.type, removeData);
                 this.extension.active = false;
             } catch (e) {
                 this.showStoreError(e);
@@ -419,10 +414,9 @@ export default {
         },
 
         clearCacheAndReloadPage() {
-            return this.cacheApiService.clear()
-                .then(() => {
-                    window.location.reload();
-                });
+            return this.cacheApiService.clear().then(() => {
+                window.location.reload();
+            });
         },
 
         openConsentAffirmationModal() {

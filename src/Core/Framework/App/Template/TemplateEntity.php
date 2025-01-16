@@ -17,28 +17,40 @@ class TemplateEntity extends Entity
 
     /**
      * @var string
+     *
+     * @deprecated tag:v6.7.0 - Will be natively typed
      */
     protected $template;
 
     /**
      * @var string
+     *
+     * @deprecated tag:v6.7.0 - Will be natively typed
      */
     protected $path;
 
     /**
      * @var bool
+     *
+     * @deprecated tag:v6.7.0 - Will be natively typed
      */
     protected $active;
 
     /**
      * @var string
+     *
+     * @deprecated tag:v6.7.0 - Will be natively typed
      */
     protected $appId;
 
     /**
      * @var AppEntity|null
+     *
+     * @deprecated tag:v6.7.0 - Will be natively typed
      */
     protected $app;
+
+    protected ?string $hash = null;
 
     public function getTemplate(): string
     {
@@ -88,5 +100,15 @@ class TemplateEntity extends Entity
     public function setApp(?AppEntity $app): void
     {
         $this->app = $app;
+    }
+
+    public function getHash(): ?string
+    {
+        return $this->hash;
+    }
+
+    public function setHash(?string $hash): void
+    {
+        $this->hash = $hash;
     }
 }

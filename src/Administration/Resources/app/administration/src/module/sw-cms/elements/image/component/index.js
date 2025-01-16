@@ -6,7 +6,7 @@ const { Mixin, Filter } = Shopware;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
@@ -30,9 +30,12 @@ export default {
 
         styles() {
             return {
-                'min-height': this.element.config.displayMode.value === 'cover' &&
-                              this.element.config.minHeight.value &&
-                              this.element.config.minHeight.value !== 0 ? this.element.config.minHeight.value : '340px',
+                'min-height':
+                    this.element.config.displayMode.value === 'cover' &&
+                    this.element.config.minHeight.value &&
+                    this.element.config.minHeight.value !== 0
+                        ? this.element.config.minHeight.value
+                        : '340px',
             };
         },
 

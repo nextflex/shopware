@@ -1,5 +1,5 @@
 /**
- * @package inventory
+ * @package discovery
  */
 import { mount } from '@vue/test-utils';
 
@@ -29,7 +29,7 @@ describe('src/module/sw-category/component/sw-category-seo-form', () => {
 
         const textFields = wrapper.findAll('sw-field-stub');
 
-        textFields.forEach(textField => {
+        textFields.forEach((textField) => {
             expect(textField.attributes().disabled).toBeUndefined();
         });
     });
@@ -39,7 +39,7 @@ describe('src/module/sw-category/component/sw-category-seo-form', () => {
 
         const textFields = wrapper.findAll('sw-field-stub');
 
-        textFields.forEach(textField => {
+        textFields.forEach((textField) => {
             expect(textField.attributes().disabled).toBe('true');
         });
     });

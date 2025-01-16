@@ -1,5 +1,5 @@
 /**
- * @package buyers-experience
+ * @package discovery
  */
 import template from './sw-settings-snippet-filter-switch.html.twig';
 import './sw-settings-snippet-filter-switch.scss';
@@ -50,7 +50,10 @@ export default {
                 if (!value.length) {
                     return true;
                 }
-                return ['small', 'large'].includes(value);
+                return [
+                    'small',
+                    'large',
+                ].includes(value);
             },
         },
 

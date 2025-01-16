@@ -23,11 +23,11 @@ use Shopware\Core\Framework\Struct\ArrayEntity;
 use Shopware\Core\Framework\Test\DataAbstractionLayer\Field\DataAbstractionLayerFieldTestBehaviour;
 use Shopware\Core\Framework\Test\DataAbstractionLayer\Field\TestDefinition\CustomFieldTestDefinition;
 use Shopware\Core\Framework\Test\DataAbstractionLayer\Field\TestDefinition\CustomFieldTestTranslationDefinition;
-use Shopware\Core\Framework\Test\IdsCollection;
 use Shopware\Core\Framework\Test\TestCaseBase\CacheTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\KernelTestBehaviour;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
+use Shopware\Core\Test\Stub\Framework\IdsCollection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -47,7 +47,7 @@ class CustomFieldTest extends TestCase
     {
         parent::setUp();
 
-        $this->connection = $this->getContainer()->get(Connection::class);
+        $this->connection = static::getContainer()->get(Connection::class);
         $this->connection->executeStatement('DROP TABLE IF EXISTS `attribute_test`');
         $this->connection->executeStatement('
             CREATE TABLE `attribute_test` (
@@ -1227,7 +1227,7 @@ class CustomFieldTest extends TestCase
      */
     private function addCustomFields(array $attributeTypes): void
     {
-        $attributeRepo = $this->getContainer()->get('custom_field.repository');
+        $attributeRepo = static::getContainer()->get('custom_field.repository');
 
         $attributes = [];
         foreach ($attributeTypes as $name => $type) {
@@ -1245,12 +1245,12 @@ class CustomFieldTest extends TestCase
 
         return new EntityRepository(
             $definition,
-            $this->getContainer()->get(EntityReaderInterface::class),
-            $this->getContainer()->get(VersionManager::class),
-            $this->getContainer()->get(EntitySearcherInterface::class),
-            $this->getContainer()->get(EntityAggregatorInterface::class),
-            $this->getContainer()->get(EventDispatcherInterface::class),
-            $this->getContainer()->get(EntityLoadedEventFactory::class)
+            static::getContainer()->get(EntityReaderInterface::class),
+            static::getContainer()->get(VersionManager::class),
+            static::getContainer()->get(EntitySearcherInterface::class),
+            static::getContainer()->get(EntityAggregatorInterface::class),
+            static::getContainer()->get(EventDispatcherInterface::class),
+            static::getContainer()->get(EntityLoadedEventFactory::class)
         );
     }
 }

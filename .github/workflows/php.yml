@@ -1,18 +1,7 @@
 name: PHP checks
 
 on:
-  push:
-    branches:
-      - trunk
   pull_request:
-    paths:
-      - '**/composer.json'
-      - changelog/**/*.md
-      - src/**/*.php
-      - src/Core/**/*
-      - src/Elasticsearch/**/*
-      - src/Storefront/DependencyInjection/*
-      - src/**/snippet/**/*.json
   workflow_dispatch:
   workflow_call:
 
@@ -21,7 +10,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: "PHP lint"
     steps:
       - name: Checkout
@@ -42,8 +31,8 @@ jobs:
       - uses: "ramsey/composer-install@v3"
         with:
           custom-cache-key: ${{ runner.os }}-setup-shopware-composer-8.2-${{ hashFiles('composer.json', 'custom/plugins/**/composer.json') }}
-          working-directory: ''
-    
+          working-directory: ""
+
       - name: Setup Shopware
         uses: shopware/setup-shopware@main
         with:
@@ -68,7 +57,7 @@ jobs:
         run: composer run lint:snippets
 
   phpstan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: "PHPStan"
     steps:
       - name: Setup Shopware
@@ -84,19 +73,19 @@ jobs:
         run: composer run phpstan -- --error-format=github --no-progress
 
   bc-checker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: "BC check"
     steps:
       - name: Clone shopware
         uses: actions/checkout@v4
         with:
-          fetch-depth: '0'
-          fetch-tags: '1'
+          fetch-depth: "0"
+          fetch-tags: "1"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: "8.2"
 
       - name: Install Dependencies
         run: |
@@ -110,16 +99,15 @@ jobs:
         if: github.event_name != 'pull_request'
         run: composer run bc-check
       - name: BC Checker PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && !contains(github.base_ref, '/feature/')
         run: composer run bc-check -- --from="origin/${{ github.base_ref }}"
 
   openapi-lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       APP_ENV: test
       APP_URL: http://localhost:8000
       APP_SECRET: def00000bb5acb32b54ff8ee130270586eec0e878f7337dc7a837acc31d3ff00f93a56b595448b4b29664847dd51991b3314ff65aeeeb761a133b0ec0e070433bff08e48
-      DATABASE_URL: mysql://root:root@127.0.0.1:3306/shopware
       DATABASE_HOST: "127.0.0.1"
     steps:
       - name: Setup Shopware
@@ -129,11 +117,11 @@ jobs:
           shopware-version: ${{ github.ref }}
           shopware-repository: ${{ github.repository }}
 
-      - name: Start Webserver
-        run: symfony server:start -d --no-tls
-
       - name: Prepare schema lint
+        env:
+          NPM_CONFIG_PREFIX: ${{ github.workspace }}/var/cache/npm
         run: |
+          echo "PATH=${{ env.NPM_CONFIG_PREFIX }}/bin:$PATH" >> $GITHUB_ENV
           curl localhost:8000/
           npm i -g @redocly/cli@latest @shopware/api-gen
           export STOREFRONT_ID=$(bin/console sales-channel:list --output json | jq -r '.[] | select(.name == "Storefront") | .id')
@@ -153,8 +141,7 @@ jobs:
 
   phpunit:
     name: "PHPUnit for ${{ matrix.suite }}"
-    continue-on-error: ${{ !matrix.stable }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -168,14 +155,14 @@ jobs:
       APP_SECRET: def00000bb5acb32b54ff8ee130270586eec0e878f7337dc7a837acc31d3ff00f93a56b595448b4b29664847dd51991b3314ff65aeeeb761a133b0ec0e070433bff08e48
       OPENSEARCH_URL: 127.0.0.1:9200
       BLUE_GREEN_DEPLOYMENT: 1
-      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
 
     services:
       elasticsearch:
         image: ${{ matrix.suite == 'integration' && 'opensearchproject/opensearch:1' || 'alpine' }}
         env:
           discovery.type: single-node
-          plugins.security.disabled: 'true'
+          plugins.security.disabled: "true"
         ports:
           - "9200:9200"
 
@@ -183,11 +170,18 @@ jobs:
       - name: Setup Shopware
         uses: shopware/setup-shopware@main
         with:
+          php-version: 8.4
           shopware-version: ${{ github.ref }}
           shopware-repository: ${{ github.repository }}
 
       - name: Start Webserver
         run: symfony server:start -d
+
+      - name: Migration test suite setup
+        if: ${{ matrix.suite == 'migration' }}
+        run: |
+          sed -i -e 's|<directory suffix=".php">src</directory>|<directory suffix=".php">src/Core/Migration</directory>|' phpunit.xml.dist
+          echo "FEATURE_ALL=major" >> $GITHUB_ENV
 
       - name: Install Shopware
         run: php src/Core/TestBootstrap.php
@@ -196,12 +190,15 @@ jobs:
         run: php -d memory_limit=-1 vendor/bin/phpunit --testsuite "${{ matrix.suite }}" --coverage-cobertura coverage.xml
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: coverage.xml
+          flags: phpunit-${{ matrix.suite }}
 
   license-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: "PHP license check"
     steps:
       - name: Setup Shopware
@@ -217,3 +214,42 @@ jobs:
       - name: Check license
         if: steps.changed-composer-json.outputs.any_changed == 'true'
         run: vendor/bin/composer-license-checker check $(xargs -n1 echo -a < .allowed-licenses)
+
+  composer-audit:
+    runs-on: ubuntu-24.04
+    name: "composer audit"
+    steps:
+      - name: Clone shopware
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+
+      - name: Install Dependencies
+        run: |
+          composer install
+
+      - name: Composer audit
+        run: |
+          composer audit
+
+  php-check:
+    if: always()
+    needs:
+    - lint
+    - phpstan
+    - openapi-lint
+    - phpunit
+    - license-check
+    - composer-audit
+
+    runs-on: Ubuntu-latest
+    steps:
+    - name: Decide whether the needed jobs succeeded or failed
+      uses: re-actors/alls-green@release/v1
+      with:
+        # allowed-failures: docs, linters
+        # allowed-skips: non-voting-flaky-job
+        jobs: ${{ toJSON(needs) }}

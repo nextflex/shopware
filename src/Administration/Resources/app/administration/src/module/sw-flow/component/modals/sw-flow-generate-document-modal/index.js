@@ -7,7 +7,7 @@ const { ShopwareError } = Shopware.Classes;
 
 /**
  * @private
- * @package services-settings
+ * @sw-package after-sales
  */
 export default {
     template,
@@ -18,7 +18,10 @@ export default {
         'repositoryFactory',
     ],
 
-    emits: ['modal-close', 'process-finish'],
+    emits: [
+        'modal-close',
+        'process-finish',
+    ],
 
     props: {
         sequence: {

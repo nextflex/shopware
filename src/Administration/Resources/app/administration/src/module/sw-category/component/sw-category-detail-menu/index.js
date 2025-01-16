@@ -1,7 +1,7 @@
 import template from './sw-category-detail-menu.html.twig';
 
 /**
- * @package inventory
+ * @package discovery
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -9,7 +9,10 @@ export default {
 
     compatConfig: Shopware.compatConfig,
 
-    inject: ['acl', 'repositoryFactory'],
+    inject: [
+        'acl',
+        'repositoryFactory',
+    ],
 
     props: {
         category: {
@@ -79,5 +82,4 @@ export default {
             this.onSetMediaItem({ targetId: dropItem.id });
         },
     },
-
 };

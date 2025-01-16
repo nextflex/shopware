@@ -1,5 +1,5 @@
 /**
- * @package buyers-experience
+ * @package discovery
  */
 
 import { mount } from '@vue/test-utils';
@@ -41,7 +41,9 @@ async function createWrapper() {
                     fetchAppModules: () => Promise.resolve([]),
                 },
                 customEntityDefinitionService: {
-                    getMenuEntries: () => { return []; },
+                    getMenuEntries: () => {
+                        return [];
+                    },
                 },
             },
         },

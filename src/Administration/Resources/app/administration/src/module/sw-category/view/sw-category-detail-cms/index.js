@@ -2,7 +2,7 @@ import template from './sw-category-detail-cms.html.twig';
 import './sw-category-detail-cms.scss';
 
 /**
- * @package inventory
+ * @package discovery
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -25,7 +25,7 @@ export default {
         },
 
         cmsPage() {
-            return Shopware.Store.get('cmsPageState').currentPage;
+            return Shopware.Store.get('cmsPage').currentPage;
         },
     },
 };

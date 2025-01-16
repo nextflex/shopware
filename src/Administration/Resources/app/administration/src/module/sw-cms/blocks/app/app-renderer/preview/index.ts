@@ -4,7 +4,7 @@ import './sw-cms-block-app-preview-renderer.scss';
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default Shopware.Component.wrapComponentConfig({
     template,
@@ -26,7 +26,7 @@ export default Shopware.Component.wrapComponentConfig({
     },
 
     computed: {
-        previewImage(): string|undefined {
+        previewImage(): string | undefined {
             return this.block.previewImage;
         },
 

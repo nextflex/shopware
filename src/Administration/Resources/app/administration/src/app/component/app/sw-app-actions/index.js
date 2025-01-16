@@ -70,17 +70,17 @@ Component.register('sw-app-actions', {
         },
 
         view() {
-            const matchedRoute = this.matchedRoutes.filter((match) => {
-                return !!match?.meta?.appSystem?.view;
-            }).pop();
+            const matchedRoute = this.matchedRoutes
+                .filter((match) => {
+                    return !!match?.meta?.appSystem?.view;
+                })
+                .pop();
 
             return matchedRoute?.meta?.appSystem?.view;
         },
 
         areActionsAvailable() {
-            return !!this.actions
-                && this.actions.length > 0
-                && this.params.length > 0;
+            return !!this.actions && this.actions.length > 0 && this.params.length > 0;
         },
 
         params() {
@@ -126,6 +126,15 @@ Component.register('sw-app-actions', {
         },
     },
 
+    created() {
+        // Reset the selectedIds when the component is created to avoid
+        // that the actions are executed on the wrong entities.
+        // Only reset when a entity exists
+        if (this.entity) {
+            Shopware.State.commit('shopwareApps/setSelectedIds', []);
+        }
+    },
+
     methods: {
         async runAction(action) {
             const entityIdList = { ids: this.params };
@@ -139,7 +148,7 @@ Component.register('sw-app-actions', {
             const { data } = await this.appActionButtonService.runAction(action.id, entityIdList);
             const { actionType, redirectUrl, status, message } = data;
 
-            this.action = this.actions.find(actionsAction => {
+            this.action = this.actions.find((actionsAction) => {
                 return actionsAction.id === action.id;
             });
 
@@ -220,7 +229,7 @@ Component.register('sw-app-actions', {
         },
 
         getUserConfig() {
-            this.userConfigRepository.search(this.userConfigCriteria, Shopware.Context.api).then(response => {
+            this.userConfigRepository.search(this.userConfigCriteria, Shopware.Context.api).then((response) => {
                 if (response.length) {
                     this.iframeUserConfig = response.first();
                 } else {

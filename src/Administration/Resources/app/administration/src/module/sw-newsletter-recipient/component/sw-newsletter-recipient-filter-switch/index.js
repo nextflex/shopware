@@ -1,7 +1,7 @@
 import template from './sw-newsletter-recipient-filter-switch.html.twig';
 
 /**
- * @package buyers-experience
+ * @sw-package after-sales
  */
 
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
@@ -33,7 +33,11 @@ export default {
 
     methods: {
         onChange(value) {
-            this.$emit('update:value', { id: this.id, group: this.group, value });
+            this.$emit('update:value', {
+                id: this.id,
+                group: this.group,
+                value,
+            });
         },
     },
 };

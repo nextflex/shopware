@@ -10,7 +10,10 @@ export default {
 
     compatConfig: Shopware.compatConfig,
 
-    emits: ['modal-close', 'remove-extension'],
+    emits: [
+        'modal-close',
+        'remove-extension',
+    ],
 
     props: {
         extensionName: {
@@ -27,27 +30,33 @@ export default {
         },
     },
 
+    data() {
+        return {
+            removePluginData: false,
+        };
+    },
+
     computed: {
         title() {
-            return this.isLicensed ?
-                this.$t(
-                    'sw-extension-store.component.sw-extension-removal-modal.titleCancel',
-                    { extensionName: this.extensionName },
-                ) :
-                this.$t(
-                    'sw-extension-store.component.sw-extension-removal-modal.titleRemove',
-                    { extensionName: this.extensionName },
-                );
+            return this.isLicensed
+                ? this.$t('sw-extension-store.component.sw-extension-removal-modal.titleCancel', {
+                      extensionName: this.extensionName,
+                  })
+                : this.$t('sw-extension-store.component.sw-extension-removal-modal.titleRemove', {
+                      extensionName: this.extensionName,
+                  });
         },
 
         alert() {
-            return this.isLicensed ? this.$tc('sw-extension-store.component.sw-extension-removal-modal.alertCancel') :
-                this.$tc('sw-extension-store.component.sw-extension-removal-modal.alertRemove');
+            return this.isLicensed
+                ? this.$tc('sw-extension-store.component.sw-extension-removal-modal.alertCancel')
+                : this.$tc('sw-extension-store.component.sw-extension-removal-modal.alertRemove');
         },
 
         btnLabel() {
-            return this.isLicensed ? this.$tc('sw-extension-store.component.sw-extension-removal-modal.labelCancel') :
-                this.$tc('sw-extension-store.component.sw-extension-removal-modal.labelRemove');
+            return this.isLicensed
+                ? this.$tc('sw-extension-store.component.sw-extension-removal-modal.labelCancel')
+                : this.$tc('sw-extension-store.component.sw-extension-removal-modal.labelRemove');
         },
     },
 

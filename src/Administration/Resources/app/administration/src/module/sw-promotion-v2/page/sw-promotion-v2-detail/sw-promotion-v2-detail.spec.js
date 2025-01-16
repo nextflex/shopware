@@ -1,5 +1,5 @@
 /**
- * @package buyers-experience
+ * @package checkout
  */
 import { mount } from '@vue/test-utils';
 
@@ -44,7 +44,6 @@ const promotionData = {
     translations: [],
     hasOrders: false,
 };
-
 
 async function createWrapper() {
     return mount(await wrapTestComponent('sw-promotion-v2-detail', { sync: true }), {

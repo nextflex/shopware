@@ -6,7 +6,7 @@ const { Context, Utils } = Shopware;
 /**
  * @event media-modal-selection-change EntityProxy[]
  * @event closeModal (void)
- * @package buyers-experience
+ * @package discovery
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -14,9 +14,15 @@ export default {
 
     compatConfig: Shopware.compatConfig,
 
-    inject: ['repositoryFactory', 'mediaService'],
+    inject: [
+        'repositoryFactory',
+        'mediaService',
+    ],
 
-    emits: ['modal-close', 'media-modal-selection-change'],
+    emits: [
+        'modal-close',
+        'media-modal-selection-change',
+    ],
 
     props: {
         initialFolderId: {
@@ -34,10 +40,16 @@ export default {
         defaultTab: {
             type: String,
             required: false,
-            validValues: ['upload', 'library'],
+            validValues: [
+                'upload',
+                'library',
+            ],
             default: 'library',
             validator(value) {
-                return ['upload', 'library'].includes(value);
+                return [
+                    'upload',
+                    'library',
+                ].includes(value);
             },
         },
 
@@ -209,9 +221,11 @@ export default {
                 return;
             }
 
-            if (folderIds.some((dissolvedId) => {
-                return dissolvedId === this.currentFolder.id;
-            })) {
+            if (
+                folderIds.some((dissolvedId) => {
+                    return dissolvedId === this.currentFolder.id;
+                })
+            ) {
                 this.folderId = this.currentFolder.parentId;
             }
 
@@ -229,9 +243,11 @@ export default {
             const updatedMedia = await this.mediaRepository.get(targetId, Context.api);
             this.selectedMediaItem = updatedMedia;
 
-            if (!this.uploads.some((upload) => {
-                return updatedMedia.id === upload.id;
-            })) {
+            if (
+                !this.uploads.some((upload) => {
+                    return updatedMedia.id === upload.id;
+                })
+            ) {
                 this.uploads.push(updatedMedia);
             }
 

@@ -5,7 +5,7 @@ const { Store } = Shopware;
 
 /**
  * @private
- * @package buyers-experience
+ * @package discovery
  */
 export default {
     template,
@@ -14,7 +14,7 @@ export default {
 
     computed: {
         currentDeviceView() {
-            return Store.get('cmsPageState').currentCmsDeviceView;
+            return Store.get('cmsPage').currentCmsDeviceView;
         },
 
         currentDeviceViewClass() {
