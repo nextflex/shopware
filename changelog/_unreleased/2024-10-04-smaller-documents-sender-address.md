@@ -1,6 +1,6 @@
 ---
 title:          smaller documents sender addresses in documents
-issue:          sender addresses in documents uses the same font size as the receiver address. Long company names with address, configured in basic information, overlaps the right section of the document. 
+issue:          #4971 
 flag:
 author:         Felix Hoffmann
 author_email:   felix@next-interactive.de
